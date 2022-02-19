@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
+    `maven-publish`
 }
 
 group = "it.pureorigins"
@@ -20,4 +21,24 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.34.1")
     implementation("org.postgresql:postgresql:42.2.16")
     implementation("org.xerial:sqlite-jdbc:3.34.0")
+}
+
+tasks {
+    jar {
+        duplicatesStrategy = DuplicatesStrategy.WARN
+        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.PureOrigins"
+            artifactId = project.name
+            version = project.version.toString()
+            
+            artifact(tasks["jar"])
+            artifact(tasks["kotlinSourcesJar"])
+        }
+    }
 }
