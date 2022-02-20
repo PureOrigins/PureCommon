@@ -36,8 +36,8 @@ publishing {
             groupId = "com.github.PureOrigins"
             artifactId = project.name
             version = project.version.toString()
-            
-            artifact(tasks["jar"])
+    
+            from(components["kotlin"])
             artifact(tasks["kotlinSourcesJar"])
         }
     }
