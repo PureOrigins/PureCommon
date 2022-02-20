@@ -10,12 +10,11 @@ version = "1.0.0"
 repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://oss.sonatype.org/content/repositories/central")
+    mavenLocal()
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.18.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     implementation("org.freemarker:freemarker:2.3.31")
     implementation("org.jetbrains.exposed:exposed-core:0.34.1")
