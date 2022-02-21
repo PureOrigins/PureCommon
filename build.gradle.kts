@@ -30,6 +30,10 @@ tasks {
         archiveClassifier.set("fat")
         mergeServiceFiles()
     }
+    
+    build {
+        dependsOn(shadowJar)
+    }
 }
 
 kotlin {
