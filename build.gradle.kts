@@ -44,7 +44,7 @@ publishing {
             artifactId = project.name
             version = project.version.toString()
     
-            from(components["java"])
+            from(components["kotlin"])
             artifact(tasks["kotlinSourcesJar"])
         }
     }

@@ -7,3 +7,5 @@ before_install:
   - export JAVA_HOME=$jdks/jdk-17.0.1
   - wget -O BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
   - ./jdk-17.0.1/bin/java -jar ./BuildTools.jar --rev 1.18.1 --remapped
+  - rm spigot-1.18.1.jar
+  - rm BuildTools.jar
