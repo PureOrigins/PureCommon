@@ -11,7 +11,7 @@ version = "1.0.0"
 repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    mavenLocal()
+    maven("https://repo.codemc.io/repository/nms/")
 }
 
 dependencies {

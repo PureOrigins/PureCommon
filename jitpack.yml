@@ -1,11 +1,5 @@
 jdk:
   - openjdk17
 before_install:
-  - curl https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_linux-x64_bin.tar.gz -o jdk-17.tar.gz
-  - tar -xzf jdk-17.tar.gz
-  - export jdks=$(pwd)
-  - export JAVA_HOME=$jdks/jdk-17.0.1
-  - wget -O BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-  - ./jdk-17.0.1/bin/java -jar ./BuildTools.jar --rev 1.18.1 --remapped
-  - rm spigot-1.18.1.jar
-  - rm BuildTools.jar
+  - sdk install java 17.0.1-open
+  - sdk use java 17.0.1-open
