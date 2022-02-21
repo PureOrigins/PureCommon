@@ -15,12 +15,12 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-    implementation("org.freemarker:freemarker:2.3.31")
-    implementation("org.jetbrains.exposed:exposed-core:0.37.3")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
-    implementation("org.postgresql:postgresql:42.3.2")
-    implementation("org.xerial:sqlite-jdbc:3.36.0.2")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    api("org.freemarker:freemarker:2.3.31")
+    api("org.jetbrains.exposed:exposed-core:0.37.3")
+    api("org.jetbrains.exposed:exposed-jdbc:0.37.3")
+    api("org.postgresql:postgresql:42.3.2")
+    api("org.xerial:sqlite-jdbc:3.36.0.2")
 }
 
 tasks {
