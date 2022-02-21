@@ -5,8 +5,5 @@ before_install:
   - tar -xzf jdk-17.tar.gz
   - export jdks=$(pwd)
   - export JAVA_HOME=$jdks/jdk-17.0.1
-  - mkdir bt
-  - cd bt
   - wget -O BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-  - ../jdk-17.0.1/bin/java -jar ./BuildTools.jar --rev 1.18.1 --remapped
-  - cd ..
+  - ./jdk-17.0.1/bin/java -jar ./BuildTools.jar --rev 1.18.1 --remapped

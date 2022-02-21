@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     `maven-publish`
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = "it.pureorigins"
@@ -24,9 +25,9 @@ dependencies {
 }
 
 tasks {
-    jar {
-        duplicatesStrategy = DuplicatesStrategy.WARN
-        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    shadowJar {
+        archiveClassifier.set("fat")
+        mergeServiceFiles()
     }
 }
 
