@@ -43,12 +43,8 @@ publishing {
             artifactId = project.name
             version = project.version.toString()
     
-            artifact(tasks.named("jar", Jar::class).get().archiveFile) {
-                builtBy(tasks["jar"])
-            }
-            artifact(tasks["kotlinSourcesJar"]) {
-                builtBy(tasks["kotlinSourcesJar"])
-            }
+            from(components["kotlin"])
+            artifact(tasks["kotlinSourcesJar"])
         }
     }
 }
