@@ -24,13 +24,21 @@ dependencies {
 }
 
 tasks {
+    jar {
+        archiveFileName.set("${project.name}-${project.version}.jar")
+    }
+    
     shadowJar {
-        archiveClassifier.set("fat")
+        archiveFileName.set("${project.name}-${project.version}-fat.jar")
         mergeServiceFiles()
     }
     
+    reobfJar {
+        outputJar.set(shadowJar.get().archiveFile)
+    }
+    
     build {
-        dependsOn(shadowJar)
+        dependsOn(reobfJar)
     }
 }
 
