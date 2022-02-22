@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "it.pureorigins"
-version = "0.1.1"
+version = "0.1.2"
 
 repositories {
     mavenCentral()
@@ -23,13 +23,27 @@ dependencies {
     api("org.xerial:sqlite-jdbc:3.36.0.2")
 }
 
-tasks {
-    shadowJar {
-        mergeServiceFiles()
-    }
-    
-    build {
-        dependsOn(reobfJar)
+afterEvaluate {
+    tasks {
+        shadowJar {
+            mergeServiceFiles()
+        }
+        
+        jar {
+            archiveClassifier.set("")
+        }
+        
+        shadowJar {
+            archiveClassifier.set("fat")
+        }
+        
+        reobfJar {
+            outputJar.set(shadowJar.get().archiveFile)
+        }
+        
+        build {
+            dependsOn(reobfJar)
+        }
     }
 }
 
