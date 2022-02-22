@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.serialization") version "1.6.10"
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("io.papermc.paperweight.userdev") version "1.3.4"
 }
 
 group = "it.pureorigins"
@@ -10,13 +11,10 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://repo.codemc.io/repository/nms/")
-    maven("https://libraries.minecraft.net/")
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT")
+    paperDevBundle("1.18.1-R0.1-SNAPSHOT")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.37.3")
