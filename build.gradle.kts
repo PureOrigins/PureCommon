@@ -24,17 +24,8 @@ dependencies {
 }
 
 tasks {
-    jar {
-        archiveFileName.set("${project.name}-${project.version}.jar")
-    }
-    
     shadowJar {
-        archiveFileName.set("${project.name}-${project.version}-fat.jar")
         mergeServiceFiles()
-    }
-    
-    reobfJar {
-        outputJar.set(shadowJar.get().archiveFile)
     }
     
     build {
@@ -54,9 +45,11 @@ publishing {
             groupId = "com.github.PureOrigins"
             artifactId = project.name
             version = project.version.toString()
-    
-            from(components["kotlin"])
-            artifact(tasks["kotlinSourcesJar"])
+            
+            afterEvaluate {
+                from(components["kotlin"])
+                artifact(tasks["kotlinSourcesJar"])
+            }
         }
     }
 }
