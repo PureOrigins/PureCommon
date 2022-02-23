@@ -4,10 +4,13 @@ import freemarker.core.CommonMarkupOutputFormat
 import freemarker.core.CommonTemplateMarkupOutputModel
 import freemarker.template.*
 import freemarker.template.utility.DeepUnwrap
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.serializer
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
+import java.awt.print.Paper
 import java.io.StringWriter
 import java.io.Writer
 import java.time.*
@@ -49,9 +52,9 @@ fun String.templateJson(args: Map<String, Any?>, locale: Locale = Locale.ROOT) =
 
 fun String.templateJson(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateJson(args.toMap(), locale)
 
-fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT): Text = if (startsWith('{') || startsWith('[')) {
-    ComponentSerializer.parse(templateJson(args, locale))!!
-} else TextComponent.fromLegacyText(template(args, locale))
+fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT, legacyCharacter: Char = '§'): PaperText = if (startsWith('{') || startsWith('[')) {
+    paperTextFromJson(templateJson(args, locale))
+} else template(args, locale).toPaperText(legacyCharacter)
 
 fun String.templateText(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateText(args.toMap(), locale)
 
@@ -95,7 +98,8 @@ private object JsonTemplateMethodModel : TemplateMethodModelEx {
         val arg: Any = DeepUnwrap.unwrap(args[0] as TemplateModel) ?: return SimpleScalar("null")
         return when (arg) {
             is BaseComponent -> SimpleScalar(ComponentSerializer.toString(arg))
-            arg is List<*> && arg.all { it is BaseComponent } -> SimpleScalar(ComponentSerializer.toString(*(arg as Text)))
+            arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toJson())
+            is Component -> SimpleScalar(arg.toJson())
             else -> SimpleScalar(json.encodeToString(json.serializersModule.serializer(arg.javaClass), arg))
         }
     }
@@ -107,7 +111,8 @@ private object PlainTemplateMethodModel : TemplateMethodModelEx {
         val arg: Any = DeepUnwrap.unwrap(args[0] as TemplateModel) ?: return SimpleScalar("null")
         return when (arg) {
             is BaseComponent -> SimpleScalar(TextComponent.toPlainText(arg))
-            arg is List<*> && arg.all { it is BaseComponent } -> SimpleScalar(TextComponent.toPlainText(*(arg as Text)))
+            arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toPlainText())
+            is Component -> SimpleScalar(arg.toPlainText())
             else -> SimpleScalar(arg.toString())
         }
     }
