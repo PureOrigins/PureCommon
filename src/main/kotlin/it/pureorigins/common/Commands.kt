@@ -1,6 +1,7 @@
 package it.pureorigins.common
 
 import com.mojang.brigadier.Command.SINGLE_SUCCESS
+import com.mojang.brigadier.Message
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -8,6 +9,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.SharedSuggestionProvider
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer
 
@@ -38,6 +40,10 @@ fun ArgumentBuilder<CommandSourceStack, *>.requiresPermission(name: String, orEl
 
 inline fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(crossinline block: CommandContext<CommandSourceStack>.() -> Iterable<String>) =
     suggests { builder ->
-        val partial = getArgument(name, String::class.java)
-        block().forEach { if (it.startsWith(partial, ignoreCase = true)) builder.suggest(it) }
+        SharedSuggestionProvider.suggest(block(), builder)
+    }
+
+inline fun <T> RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(noinline suggestions: (T) -> String, noinline tooltips: (T) -> Message, crossinline block: CommandContext<CommandSourceStack>.() -> Iterable<T>) =
+    suggests { builder ->
+        SharedSuggestionProvider.suggest(block(), builder, suggestions, tooltips)
     }

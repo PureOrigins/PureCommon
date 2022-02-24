@@ -1,13 +1,20 @@
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
-    `maven-publish`
-    id("com.github.johnrengelman.shadow") version "7.0.0"
     id("io.papermc.paperweight.userdev") version "1.3.4"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    `maven-publish`
 }
 
 group = "it.pureorigins"
-version = "0.2.0"
+version = "0.2.1"
+
+bukkit {
+    name = project.name
+    version = project.version.toString()
+    main = "it.pureorigins.common.PureCommon"
+}
 
 repositories {
     mavenCentral()
