@@ -13,7 +13,7 @@ version = "0.2.1"
 bukkit {
     name = project.name
     version = project.version.toString()
-    main = "it.pureorigins.common.PureCommon"
+    main = "it.pureorigins.${project.name.toLowerCase()}.${project.name}"
 }
 
 repositories {
