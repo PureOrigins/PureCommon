@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.SharedSuggestionProvider
 import org.bukkit.Bukkit
@@ -47,3 +48,5 @@ inline fun <T> RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(noinli
     suggests { builder ->
         SharedSuggestionProvider.suggest(block(), builder, suggestions, tooltips)
     }
+
+val CommandSourceStack.player get() = playerOrException.bukkitEntity
