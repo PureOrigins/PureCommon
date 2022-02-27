@@ -14,6 +14,7 @@ bukkit {
     name = project.name
     version = project.version.toString()
     main = "it.pureorigins.common.${project.name}"
+    apiVersion = "1.18"
 }
 
 repositories {
