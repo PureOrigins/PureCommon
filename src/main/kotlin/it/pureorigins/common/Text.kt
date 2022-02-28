@@ -11,6 +11,7 @@ import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
+import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -39,6 +40,14 @@ fun Audience.sendMessage(text: PaperText?, position: ChatMessageType = ChatMessa
             ChatMessageType.ACTION_BAR -> sendActionBar(text)
         }
     }
+}
+
+fun CommandSourceStack.sendMessage(text: SpigotText?, position: ChatMessageType = ChatMessageType.SYSTEM, sender: UUID? = null) {
+    return bukkitSender.sendMessage(text, position, sender)
+}
+
+fun CommandSourceStack.sendMessage(text: PaperText?, position: ChatMessageType = ChatMessageType.SYSTEM, sender: UUID? = null) {
+    return bukkitSender.sendMessage(text, position, sender)
 }
 
 @Suppress("DEPRECATION")
