@@ -4,13 +4,10 @@ import freemarker.core.CommonMarkupOutputFormat
 import freemarker.core.CommonTemplateMarkupOutputModel
 import freemarker.template.*
 import freemarker.template.utility.DeepUnwrap
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.serializer
-import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
-import java.awt.print.Paper
 import java.io.StringWriter
 import java.io.Writer
 import java.time.*
@@ -99,7 +96,8 @@ private object JsonTemplateMethodModel : TemplateMethodModelEx {
         return when (arg) {
             is BaseComponent -> SimpleScalar(ComponentSerializer.toString(arg))
             arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toJson())
-            is Component -> SimpleScalar(arg.toJson())
+            is PaperText -> SimpleScalar(arg.toJson())
+            is MinecraftText -> SimpleScalar(arg.toJson())
             else -> SimpleScalar(json.encodeToString(json.serializersModule.serializer(arg.javaClass), arg))
         }
     }
@@ -112,7 +110,8 @@ private object PlainTemplateMethodModel : TemplateMethodModelEx {
         return when (arg) {
             is BaseComponent -> SimpleScalar(TextComponent.toPlainText(arg))
             arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toPlainText())
-            is Component -> SimpleScalar(arg.toPlainText())
+            is PaperText -> SimpleScalar(arg.toPlainText())
+            is MinecraftText -> SimpleScalar(arg.toPlainText())
             else -> SimpleScalar(arg.toString())
         }
     }
