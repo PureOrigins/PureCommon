@@ -1,5 +1,6 @@
 package it.pureorigins.common
 
+import io.papermc.paper.adventure.AdventureComponent
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.audience.MessageType
 import net.kyori.adventure.identity.Identity
@@ -109,3 +110,4 @@ fun PaperText.toPlainText(): String = PlainTextComponentSerializer.plainText().s
 fun MinecraftText.toPlainText(): String = this.string
 fun LegacyText.toSpigotText(): SpigotText = TextComponent.fromLegacyText(this)
 fun LegacyText.toPaperText(legacyCharacter: Char = '§'): PaperText = LegacyComponentSerializer.legacy(legacyCharacter).deserialize(this)
+fun PaperText.toMinecraftText(): MinecraftText = AdventureComponent(this)
