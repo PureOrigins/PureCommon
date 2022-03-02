@@ -1,5 +1,6 @@
 package it.pureorigins.common
 
+import java.lang.invoke.MethodHandles
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
@@ -12,20 +13,23 @@ fun getPrivate(field: Field, instance: Any? = null): Any? {
 }
 
 fun getPrivate(`class`: Class<*>, field: String, instance: Any? = null): Any? {
-    return getPrivate(`class`.getDeclaredField(field))
+    return getPrivate(`class`.getDeclaredField(field), instance)
 }
 
 fun setPrivateFinal(field: Field, instance: Any? = null, value: Any?) {
-    val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
-    field.isAccessible = true
-    val modifiersField = Field::class.java.getDeclaredField("modifiers")
-    modifiersField.isAccessible = true
-    val oldModifiers = modifiersField[field]
-    modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
-    field[instance] = value
-    modifiersField.set(field, oldModifiers)
-    modifiersField.isAccessible = false
-    field.isAccessible = oldAccessible
+    try {
+        val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
+        field.isAccessible = true
+        val modifiersField = MethodHandles.privateLookupIn(Field::class.java, MethodHandles.lookup()).findVarHandle(Field::class.java, "modifiers", Integer.TYPE)
+        val oldModifiers = modifiersField[field]
+        modifiersField.set(field, field.modifiers and Modifier.FINAL.inv())
+        field[instance] = value
+        modifiersField.set(field, oldModifiers)
+        field.isAccessible = oldAccessible
+    } catch (e: IllegalAccessException) {
+        System.err.println("This function requires '--add-opens java.base/java.lang.reflect=ALL-UNNAMED' to function properly.")
+        throw e
+    }
 }
 
 fun setPrivateFinal(`class`: Class<*>, field: String, instance: Any? = null, value: Any?) {
@@ -33,16 +37,19 @@ fun setPrivateFinal(`class`: Class<*>, field: String, instance: Any? = null, val
 }
 
 fun updatePrivateFinal(field: Field, instance: Any? = null, value: (Any?) -> Any?) {
-    val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
-    field.isAccessible = true
-    val modifiersField = Field::class.java.getDeclaredField("modifiers")
-    modifiersField.isAccessible = true
-    val oldModifiers = modifiersField.get(field)
-    modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
-    field[instance] = value(field[instance])
-    modifiersField.set(field, oldModifiers)
-    modifiersField.isAccessible = false
-    field.isAccessible = oldAccessible
+    try {
+        val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
+        field.isAccessible = true
+        val modifiersField = MethodHandles.privateLookupIn(Field::class.java, MethodHandles.lookup()).findVarHandle(Field::class.java, "modifiers", Integer.TYPE)
+        val oldModifiers = modifiersField.get(field)
+        modifiersField.set(field, field.modifiers and Modifier.FINAL.inv())
+        field[instance] = value(field[instance])
+        modifiersField.set(field, oldModifiers)
+        field.isAccessible = oldAccessible
+    } catch (e: IllegalAccessException) {
+        System.err.println("This function requires '--add-opens java.base/java.lang.reflect=ALL-UNNAMED' to function properly.")
+        throw e
+    }
 }
 
 fun updatePrivateFinal(`class`: Class<*>, field: String, instance: Any? = null, value: (Any?) -> Any?) {

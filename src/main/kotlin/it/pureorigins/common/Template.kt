@@ -6,8 +6,8 @@ import freemarker.template.*
 import freemarker.template.utility.DeepUnwrap
 import kotlinx.serialization.serializer
 import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
+import net.minecraft.network.chat.TextComponent
 import java.io.StringWriter
 import java.io.Writer
 import java.time.*
@@ -49,9 +49,13 @@ fun String.templateJson(args: Map<String, Any?>, locale: Locale = Locale.ROOT) =
 
 fun String.templateJson(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateJson(args.toMap(), locale)
 
-fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT, legacyCharacter: Char = '§'): PaperText = if (startsWith('{') || startsWith('[')) {
-    paperTextFromJson(templateJson(args, locale))
-} else template(args, locale).toPaperText(legacyCharacter)
+fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT): MutableText {
+    return if (startsWith('{') || startsWith('[')) {
+        textFromJson(templateJson(args, locale))
+    } else {
+        TextComponent(template(args, locale))
+    }
+}
 
 fun String.templateText(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateText(args.toMap(), locale)
 
@@ -97,7 +101,7 @@ private object JsonTemplateMethodModel : TemplateMethodModelEx {
             is BaseComponent -> SimpleScalar(ComponentSerializer.toString(arg))
             arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toJson())
             is PaperText -> SimpleScalar(arg.toJson())
-            is MinecraftText -> SimpleScalar(arg.toJson())
+            is Text -> SimpleScalar(arg.toJson())
             else -> SimpleScalar(json.encodeToString(json.serializersModule.serializer(arg.javaClass), arg))
         }
     }
@@ -108,10 +112,10 @@ private object PlainTemplateMethodModel : TemplateMethodModelEx {
         if (args.size != 1) throw TemplateModelException("Wrong arguments")
         val arg: Any = DeepUnwrap.unwrap(args[0] as TemplateModel) ?: return SimpleScalar("null")
         return when (arg) {
-            is BaseComponent -> SimpleScalar(TextComponent.toPlainText(arg))
-            arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toPlainText())
+            is BaseComponent -> SimpleScalar(net.md_5.bungee.api.chat.TextComponent.toPlainText(arg))
+            (arg is Array<*> && arg.all { it is BaseComponent }) -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toPlainText())
             is PaperText -> SimpleScalar(arg.toPlainText())
-            is MinecraftText -> SimpleScalar(arg.toPlainText())
+            is Text -> SimpleScalar(arg.toPlainText())
             else -> SimpleScalar(arg.toString())
         }
     }
