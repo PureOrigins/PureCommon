@@ -12,7 +12,7 @@ fun unsafeGetField(`class`: Class<*>, field: String, instance: Any): Any? {
 }
 
 fun unsafeGetStaticField(field: Field): Any? {
-    return unsafe.getObject(unsafe.staticFieldBase(field), unsafe.objectFieldOffset(field))
+    return unsafe.getObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field))
 }
 
 fun unsafeGetStaticField(`class`: Class<*>, field: String): Any? {
