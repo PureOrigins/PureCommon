@@ -1,57 +1,42 @@
 package it.pureorigins.common
 
-import java.lang.invoke.MethodHandles
+import sun.misc.Unsafe
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 
-fun getPrivate(field: Field, instance: Any? = null): Any? {
-    val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
+fun unsafeGetField(field: Field, instance: Any): Any? {
+    return unsafe.getObject(instance, unsafe.objectFieldOffset(field))
+}
+
+fun unsafeGetField(`class`: Class<*>, field: String, instance: Any): Any? {
+    return unsafeGetField(`class`.getDeclaredField(field), instance)
+}
+
+fun unsafeGetStaticField(field: Field): Any? {
+    return unsafe.getObject(unsafe.staticFieldBase(field), unsafe.objectFieldOffset(field))
+}
+
+fun unsafeGetStaticField(`class`: Class<*>, field: String): Any? {
+    return unsafeGetStaticField(`class`.getDeclaredField(field))
+}
+
+fun unsafeSetField(field: Field, instance: Any, value: Any?) {
+    unsafe.putObject(instance, unsafe.objectFieldOffset(field), value)
+}
+
+fun unsafeSetField(`class`: Class<*>, field: String, instance: Any, value: Any?) {
+    unsafeSetField(`class`.getDeclaredField(field), instance, value)
+}
+
+fun unsafeSetStaticField(field: Field, value: Any?) {
+    unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), value)
+}
+
+fun unsafeSetStaticField(`class`: Class<*>, field: String, value: Any?) {
+    return unsafeSetStaticField(`class`.getDeclaredField(field), value)
+}
+
+private val unsafe by lazy {
+    val field = Unsafe::class.java.getDeclaredField("theUnsafe")
     field.isAccessible = true
-    val value = field[instance]
-    field.isAccessible = oldAccessible
-    return value
-}
-
-fun getPrivate(`class`: Class<*>, field: String, instance: Any? = null): Any? {
-    return getPrivate(`class`.getDeclaredField(field), instance)
-}
-
-fun setPrivateFinal(field: Field, instance: Any? = null, value: Any?) {
-    try {
-        val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
-        field.isAccessible = true
-        val modifiersField = MethodHandles.privateLookupIn(Field::class.java, MethodHandles.lookup()).findVarHandle(Field::class.java, "modifiers", Integer.TYPE)
-        val oldModifiers = modifiersField[field]
-        modifiersField.set(field, field.modifiers and Modifier.FINAL.inv())
-        field[instance] = value
-        modifiersField.set(field, oldModifiers)
-        field.isAccessible = oldAccessible
-    } catch (e: IllegalAccessException) {
-        System.err.println("This function requires '--add-opens java.base/java.lang.reflect=ALL-UNNAMED' to function properly.")
-        throw e
-    }
-}
-
-fun setPrivateFinal(`class`: Class<*>, field: String, instance: Any? = null, value: Any?) {
-    return setPrivateFinal(`class`.getDeclaredField(field), instance, value)
-}
-
-fun updatePrivateFinal(field: Field, instance: Any? = null, value: (Any?) -> Any?) {
-    try {
-        val oldAccessible = @Suppress("DEPRECATION") field.isAccessible
-        field.isAccessible = true
-        val modifiersField = MethodHandles.privateLookupIn(Field::class.java, MethodHandles.lookup()).findVarHandle(Field::class.java, "modifiers", Integer.TYPE)
-        val oldModifiers = modifiersField.get(field)
-        modifiersField.set(field, field.modifiers and Modifier.FINAL.inv())
-        field[instance] = value(field[instance])
-        modifiersField.set(field, oldModifiers)
-        field.isAccessible = oldAccessible
-    } catch (e: IllegalAccessException) {
-        System.err.println("This function requires '--add-opens java.base/java.lang.reflect=ALL-UNNAMED' to function properly.")
-        throw e
-    }
-}
-
-fun updatePrivateFinal(`class`: Class<*>, field: String, instance: Any? = null, value: (Any?) -> Any?) {
-    return updatePrivateFinal(`class`.getDeclaredField(field), instance, value)
+    field[null] as Unsafe
 }
