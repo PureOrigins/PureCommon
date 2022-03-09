@@ -99,7 +99,7 @@ private object JsonTemplateMethodModel : TemplateMethodModelEx {
         val arg: Any = DeepUnwrap.unwrap(args[0] as TemplateModel) ?: return SimpleScalar("null")
         return when (arg) {
             is BaseComponent -> SimpleScalar(ComponentSerializer.toString(arg))
-            arg is Array<*> && arg.all { it is BaseComponent } -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toJson())
+            (arg is Array<*> && arg.all { it is BaseComponent }) -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toJson())
             is PaperText -> SimpleScalar(arg.toJson())
             is Text -> SimpleScalar(arg.toJson())
             else -> SimpleScalar(json.encodeToString(json.serializersModule.serializer(arg.javaClass), arg))
