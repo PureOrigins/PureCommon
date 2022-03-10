@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "it.pureorigins"
-version = "0.3.1"
+version = "0.3.2"
 
 bukkit {
     name = project.name
@@ -27,7 +27,7 @@ dependencies {
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.37.3")
     api("org.jetbrains.exposed:exposed-jdbc:0.37.3")
-    api("org.postgresql:postgresql:42.3.2")
+    api("org.postgresql:postgresql:42.3.3")
     api("org.xerial:sqlite-jdbc:3.36.0.2")
 }
 
