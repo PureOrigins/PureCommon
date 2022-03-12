@@ -10,13 +10,12 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.SharedSuggestionProvider
-import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer
+import net.minecraft.server.MinecraftServer
+import org.bukkit.entity.Player
 
 
 fun registerCommand(literal: LiteralArgumentBuilder<CommandSourceStack>, vararg aliases: String) {
-    val dedicatedServer = (Bukkit.getServer() as CraftServer).server
-    val dispatcher = dedicatedServer.vanillaCommandDispatcher.dispatcher
+    @Suppress("DEPRECATION") val dispatcher = MinecraftServer.getServer().vanillaCommandDispatcher.dispatcher
     val node = dispatcher.register(literal)
     for (alias in aliases) {
         dispatcher.register(LiteralArgumentBuilder.literal<CommandSourceStack>(alias).redirect(node))
@@ -48,4 +47,4 @@ inline fun <T> RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(noinli
         SharedSuggestionProvider.suggest(block(), builder, suggestions, tooltips)
     }
 
-val CommandSourceStack.player get() = playerOrException.bukkitEntity
+val CommandSourceStack.player get() = bukkitSender as? Player ?: throw CommandSourceStack.ERROR_NOT_PLAYER.create()
