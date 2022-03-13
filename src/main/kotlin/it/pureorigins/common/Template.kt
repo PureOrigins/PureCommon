@@ -50,10 +50,11 @@ fun String.templateJson(args: Map<String, Any?>, locale: Locale = Locale.ROOT) =
 fun String.templateJson(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateJson(args.toMap(), locale)
 
 fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT): MutableText {
-    return if (startsWith('{') || startsWith('[')) {
-        textFromJson(templateJson(args, locale))
+    val text = templateJson(args, locale)
+    return if (text.startsWith('{') || text.startsWith('[')) {
+        textFromJson(text)
     } else {
-        TextComponent(template(args, locale))
+        TextComponent(text)
     }
 }
 
