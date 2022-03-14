@@ -13,7 +13,6 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.ChatType
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer
 import java.util.*
 
 typealias LegacyText = String
@@ -62,6 +61,6 @@ fun Player.sendNullableMessage(text: Text?, position: ChatType = ChatType.SYSTEM
 
 fun org.bukkit.entity.Player.sendNullableMessage(text: Text?, position: ChatType = ChatType.SYSTEM, sender: UUID = NIL_UUID) {
     if (text != null) {
-        (this as CraftPlayer).handle.sendNullableMessage(text, position, sender)
+        nms.sendNullableMessage(text, position, sender)
     }
 }
