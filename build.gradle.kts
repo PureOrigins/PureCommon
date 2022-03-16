@@ -8,13 +8,13 @@ plugins {
 }
 
 group = "it.pureorigins"
-version = "0.3.6"
+version = "0.3.7"
 
 bukkit {
     name = project.name
     version = project.version.toString()
     main = "it.pureorigins.common.${project.name}"
-    apiVersion = "1.18"
+    apiVersion = "1.18.2"
 }
 
 repositories {
@@ -22,13 +22,13 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.18.1-R0.1-SNAPSHOT")
+    paperDevBundle("1.18.2-R0.1-SNAPSHOT")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.37.3")
     api("org.jetbrains.exposed:exposed-jdbc:0.37.3")
     api("org.postgresql:postgresql:42.3.3")
-    api("org.xerial:sqlite-jdbc:3.36.0.2")
+    api("org.xerial:sqlite-jdbc:3.36.0.3")
 }
 
 afterEvaluate {
