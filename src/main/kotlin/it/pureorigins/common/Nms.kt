@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 
 val server: DedicatedServer = Bukkit.getServer().nms
 
-val Player.nms: ServerPlayer get() = (this as CraftPlayer).player as ServerPlayer
+val Player.nms: ServerPlayer get() = (this as CraftPlayer).handle as ServerPlayer
 val World.nms: ServerLevel get() = (this as CraftWorld).handle as ServerLevel
 val Entity.nms: net.minecraft.world.entity.Entity get() = (this as CraftEntity).handle
 val Server.nms: DedicatedServer get() = (this as CraftServer).server
