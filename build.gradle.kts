@@ -14,7 +14,7 @@ bukkit {
     name = project.name
     version = project.version.toString()
     main = "it.pureorigins.common.${project.name}"
-    apiVersion = "1.18.2"
+    apiVersion = "1.18"
 }
 
 repositories {
@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("${bukkit.apiVersion}-R0.1-SNAPSHOT")
+    paperDevBundle("1.18.2-R0.1-SNAPSHOT")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.37.3")
