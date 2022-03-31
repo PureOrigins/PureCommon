@@ -15,26 +15,60 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
         requiresPermission("purecommon.database")
         success { source.sendNullableMessage(config.database.usage?.templateText()) }
         then(argument("name", string()) {
+            suggestions { getDatabases().keys }
             success {
                 val name = getString(this, "name")
-                val url = getDatabases()[name] ?: return@success source.sendNullableMessage(config.invalidDatabase?.templateText("name" to name))
-                val database = Database.connect(url)
-                source.sendNullableMessage(config.database.get?.templateText("name" to name, "url" to url, "database" to database))
+                val db = getDatabases()[name] ?: return@success source.sendNullableMessage(config.invalidDatabase?.templateText("name" to name))
+                val database = Database.connect(db.url, user = db.username, password = db.password)
+                source.sendNullableMessage(config.database.get?.templateText("name" to name, "url" to db.url, "database" to database))
             }
-            then(argument("url", greedyString()) {
+            then(argument("url", string()) {
                 success {
                     val name = getString(this, "name")
                     val url = getString(this, "url")
                     try {
                         val db = Database.connect(url)
                         val databases = getDatabases()
-                        databases[name] = url
+                        databases[name] = DatabaseInfo(url)
                         setDatabases(databases)
                         source.sendNullableMessage(config.database.set?.templateText("name" to name, "url" to url, "database" to db))
                     } catch (e: Exception) {
                         source.sendNullableMessage(config.error?.templateText("name" to name, "url" to url, "error" to e))
                     }
                 }
+                then(argument("username", string()) {
+                    success {
+                        val name = getString(this, "name")
+                        val url = getString(this, "url")
+                        val username = getString(this, "username")
+                        try {
+                            val db = Database.connect(url, user = username)
+                            val databases = getDatabases()
+                            databases[name] = DatabaseInfo(url, username)
+                            setDatabases(databases)
+                            source.sendNullableMessage(config.database.set?.templateText("name" to name, "url" to url, "database" to db))
+                        } catch (e: Exception) {
+                            source.sendNullableMessage(config.error?.templateText("name" to name, "url" to url, "error" to e))
+                        }
+                    }
+                    then(argument("password", string()) {
+                        success {
+                            val name = getString(this, "name")
+                            val url = getString(this, "url")
+                            val username = getString(this, "username")
+                            val password = getString(this, "password")
+                            try {
+                                val db = Database.connect(url, user = username, password = password)
+                                val databases = getDatabases()
+                                databases[name] = DatabaseInfo(url, username, password)
+                                setDatabases(databases)
+                                source.sendNullableMessage(config.database.set?.templateText("name" to name, "url" to url, "database" to db))
+                            } catch (e: Exception) {
+                                source.sendNullableMessage(config.error?.templateText("name" to name, "url" to url, "error" to e))
+                            }
+                        }
+                    })
+                })
             })
         })
     }
@@ -43,18 +77,19 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
         requiresPermission("purecommon.query")
         success { source.sendNullableMessage(config.query.usage?.templateText()) }
         then(argument("database", string()) {
+            suggestions { getDatabases().keys }
             success { source.sendNullableMessage(config.query.usage?.templateText()) }
             then(argument("query", greedyString()) {
                 success {
                     val databaseName = getString(this, "database")
                     val query = getString(this, "query")
-                    val url = getDatabases()[databaseName] ?: return@success source.sendNullableMessage(config.invalidDatabase?.templateText("name" to databaseName))
+                    val database = getDatabases()[databaseName] ?: return@success source.sendNullableMessage(config.invalidDatabase?.templateText("name" to databaseName))
                     try {
-                        transaction(Database.connect(url)) {
+                        transaction(Database.connect(database.url, user = database.username, password = database.password)) {
                             val result = exec(query) {
                                 val columns = it.metaData.columnCount
                                 
-                                val list = mutableListOf<Array<String>>()
+                                val list = mutableListOf<Array<String?>>()
                                 list += Array(columns) { i -> it.metaData.getColumnName(i + 1) }
                                 
                                 var size = 0
@@ -63,27 +98,30 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
                                     size++
                                 }
                                 while (it.next()) size++
-                                source.sendNullableMessage(config.query.result?.templateText("query" to query, "url" to url, "results" to list, "size" to size))
+                                source.sendNullableMessage(config.query.result?.templateText("query" to query, "url" to database.url, "results" to list, "size" to size))
                             }
                             if (result == null) {
-                                source.sendNullableMessage(config.query.result?.templateText("query" to query, "url" to url, "results" to emptyList<Array<String>>(), "size" to 0))
+                                source.sendNullableMessage(config.query.result?.templateText("query" to query, "url" to database.url, "results" to emptyList<Array<String>>(), "size" to 0))
                             }
                         }
                     } catch (e: Exception) {
-                        source.sendNullableMessage(config.error?.templateText("name" to name, "url" to url, "error" to e))
+                        source.sendNullableMessage(config.error?.templateText("name" to name, "url" to database.url, "error" to e))
                     }
                 }
             })
         })
     }
     
-    fun getDatabases(): MutableMap<String, String> {
+    fun getDatabases(): MutableMap<String, DatabaseInfo> {
         return json.readFileAs(plugin.file("databases.json"), mutableMapOf())
     }
     
-    fun setDatabases(databases: Map<String, String>) {
+    fun setDatabases(databases: Map<String, DatabaseInfo>) {
         json.writeFile(plugin.file("databases.json"), databases)
     }
+    
+    @Serializable
+    data class DatabaseInfo(val url: String, val username: String = "", val password: String = "")
     
     @Serializable
     data class Config(
