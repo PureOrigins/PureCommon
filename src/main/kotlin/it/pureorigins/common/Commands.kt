@@ -8,24 +8,40 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import net.minecraft.commands.CommandSourceStack
-import net.minecraft.commands.SharedSuggestionProvider
-import net.minecraft.server.MinecraftServer
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
 
 
-fun registerCommand(literal: LiteralArgumentBuilder<CommandSourceStack>, vararg aliases: String) {
-    @Suppress("DEPRECATION") val dispatcher = MinecraftServer.getServer().vanillaCommandDispatcher.dispatcher
-    val node = dispatcher.register(literal)
-    for (alias in aliases) {
-        dispatcher.register(LiteralArgumentBuilder.literal<CommandSourceStack>(alias).redirect(node))
+fun registerCommand(
+    manager: LifecycleEventManager<Plugin>,
+    literal: LiteralArgumentBuilder<CommandSourceStack>,
+    vararg aliases: String
+) {
+    manager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
+        {
+            val dispatcher = event.registrar().dispatcher
+            val node = dispatcher.register(LiteralArgumentBuilder.literal<CommandSourceStack>(literal.literal))
+            for (alias in aliases) {
+                dispatcher.register(
+                    LiteralArgumentBuilder.literal<CommandSourceStack>(alias).redirect(node)
+                )
+            }
+        }
     }
 }
 
 inline fun literal(name: String, block: LiteralArgumentBuilder<CommandSourceStack>.() -> Unit) =
     LiteralArgumentBuilder.literal<CommandSourceStack>(name).apply(block)!!
 
-inline fun <T> argument(name: String, type: ArgumentType<T>, block: RequiredArgumentBuilder<CommandSourceStack, T>.() -> Unit) =
+inline fun <T> argument(
+    name: String,
+    type: ArgumentType<T>,
+    block: RequiredArgumentBuilder<CommandSourceStack, T>.() -> Unit
+) =
     RequiredArgumentBuilder.argument<CommandSourceStack, T>(name, type).apply(block)!!
 
 inline fun RequiredArgumentBuilder<CommandSourceStack, *>.suggests(crossinline block: CommandContext<CommandSourceStack>.(SuggestionsBuilder) -> Unit) =
@@ -42,7 +58,11 @@ inline fun RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(crossinlin
         SharedSuggestionProvider.suggest(block(), builder)
     }
 
-inline fun <T> RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(noinline suggestions: (T) -> String, noinline tooltips: (T) -> Message, crossinline block: CommandContext<CommandSourceStack>.() -> Iterable<T>) =
+inline fun <T> RequiredArgumentBuilder<CommandSourceStack, *>.suggestions(
+    noinline suggestions: (T) -> String,
+    noinline tooltips: (T) -> Message,
+    crossinline block: CommandContext<CommandSourceStack>.() -> Iterable<T>
+) =
     suggests { builder ->
         SharedSuggestionProvider.suggest(block(), builder, suggestions, tooltips)
     }

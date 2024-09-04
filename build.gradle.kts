@@ -1,34 +1,36 @@
+import org.gradle.kotlin.dsl.bukkit
+
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
-    id("io.papermc.paperweight.userdev") version "1.3.4"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.serialization") version "2.0.20"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
 }
 
 group = "it.pureorigins"
-version = "0.3.10"
+version = "0.4.1"
 
 bukkit {
     name = project.name
     version = project.version.toString()
     main = "it.pureorigins.common.${project.name}"
-    apiVersion = "1.18"
+    apiVersion = "1.21.1"
 }
 
 repositories {
     mavenCentral()
+    maven("https://repo.purpurmc.org/snapshots")
 }
 
 dependencies {
-    paperDevBundle("1.18.2-R0.1-SNAPSHOT")
+    compileOnly("org.purpurmc.purpur", "purpur-api", "1.21.1-R0.1-SNAPSHOT")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.37.3")
     api("org.jetbrains.exposed:exposed-jdbc:0.37.3")
-    api("org.postgresql:postgresql:42.3.3")
-    api("org.xerial:sqlite-jdbc:3.36.0.3")
+    api("org.postgresql:postgresql:42.7.2")
+    api("org.xerial:sqlite-jdbc:3.41.2.2")
 }
 
 afterEvaluate {
@@ -44,20 +46,21 @@ afterEvaluate {
         shadowJar {
             archiveClassifier.set("fat")
         }
-        
-        reobfJar {
+
+        /*reobfJar {
             outputJar.set(shadowJar.get().archiveFile)
-        }
+        }*/
         
         build {
-            dependsOn(reobfJar)
+            //dependsOn(reobfJar)
+            dependsOn(shadowJar)
         }
     }
 }
 
 kotlin {
     jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+        this.languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
