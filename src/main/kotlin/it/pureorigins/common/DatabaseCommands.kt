@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class DatabaseCommand(private val plugin: PureCommon, private val config: Config) {
     fun register() {
         val manager = plugin.lifecycleManager;
+
         registerCommand(manager, database)
         registerCommand(manager, query)
     }
