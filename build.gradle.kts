@@ -24,8 +24,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.purpurmc.purpur", "purpur-api", "1.21.1-R0.1-SNAPSHOT")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    compileOnly("org.purpurmc.purpur:purpur-api:1.21.1-R0.1-SNAPSHOT")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.37.3")
     api("org.jetbrains.exposed:exposed-jdbc:0.37.3")

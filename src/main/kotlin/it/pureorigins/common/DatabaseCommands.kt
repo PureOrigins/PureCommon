@@ -1,19 +1,14 @@
 package it.pureorigins.common
 
 import com.mojang.brigadier.arguments.StringArgumentType.*
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import io.papermc.paper.command.brigadier.CommandSourceStack
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DatabaseCommand(private val plugin: PureCommon, private val config: Config) {
-    fun register() {
-        val manager = plugin.lifecycleManager;
-        registerCommand(manager, database)
-        registerCommand(manager, query)
+    fun register() = with(plugin) {
+        registerCommand(database)
+        registerCommand(query)
     }
     
     val database get() = literal("database") {

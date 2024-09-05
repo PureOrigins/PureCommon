@@ -2,18 +2,16 @@ package it.pureorigins.common
 
 import freemarker.core.CommonMarkupOutputFormat
 import freemarker.core.CommonTemplateMarkupOutputModel
+import freemarker.core.HTMLOutputFormat
 import freemarker.template.*
 import freemarker.template.utility.DeepUnwrap
 import kotlinx.serialization.serializer
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.chat.ComponentSerializer
-import net.minecraft.network.chat.TextComponent
+import net.kyori.adventure.text.minimessage.MiniMessage
 import java.io.StringWriter
 import java.io.Writer
 import java.time.*
 import java.util.*
 import kotlin.random.Random
-
 
 private fun String.template(args: Map<String, Any?>, configuration: Configuration.() -> Unit): String {
     val reader = reader()
@@ -47,14 +45,20 @@ fun String.templateJson(args: Map<String, Any?>, locale: Locale = Locale.ROOT) =
     outputFormat = JsonOutputFormat
 }
 
+fun String.templateHtml(args: Map<String, Any?>, locale: Locale = Locale.ROOT) = template(args) {
+    this.locale = locale
+    outputFormat = HTMLOutputFormat.INSTANCE
+}
+
 fun String.templateJson(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateJson(args.toMap(), locale)
 
-fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT): MutableText {
-    val text = templateJson(args, locale)
-    return if (text.startsWith('{') || text.startsWith('[')) {
+fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT): Text {
+    return if (startsWith('{') || startsWith('[') || startsWith('"')) {
+        val text = templateJson(args, locale)
         textFromJson(text)
     } else {
-        TextComponent(text)
+        val text = templateHtml(args, locale)
+        MiniMessage.miniMessage().deserialize(text)
     }
 }
 
@@ -90,7 +94,7 @@ private object JsonOutputFormat : CommonMarkupOutputFormat<TemplateJsonOutputMod
 private object UnicodeTemplateMethodModel : TemplateMethodModelEx {
     override fun exec(args: MutableList<Any?>): Any {
         if (args.size != 1) throw TemplateModelException("Wrong arguments")
-        return SimpleScalar((args[0] as SimpleNumber).asNumber.toChar().toString())
+        return SimpleScalar((args[0] as SimpleNumber).asNumber.toInt().toChar().toString())
     }
 }
 
@@ -99,9 +103,6 @@ private object JsonTemplateMethodModel : TemplateMethodModelEx {
         if (args.size != 1) throw TemplateModelException("Wrong arguments")
         val arg: Any = DeepUnwrap.unwrap(args[0] as TemplateModel) ?: return SimpleScalar("null")
         return when (arg) {
-            is BaseComponent -> SimpleScalar(ComponentSerializer.toString(arg))
-            (arg is Array<*> && arg.all { it is BaseComponent }) -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toJson())
-            is PaperText -> SimpleScalar(arg.toJson())
             is Text -> SimpleScalar(arg.toJson())
             else -> SimpleScalar(json.encodeToString(json.serializersModule.serializer(arg.javaClass), arg))
         }
@@ -113,9 +114,6 @@ private object PlainTemplateMethodModel : TemplateMethodModelEx {
         if (args.size != 1) throw TemplateModelException("Wrong arguments")
         val arg: Any = DeepUnwrap.unwrap(args[0] as TemplateModel) ?: return SimpleScalar("null")
         return when (arg) {
-            is BaseComponent -> SimpleScalar(net.md_5.bungee.api.chat.TextComponent.toPlainText(arg))
-            (arg is Array<*> && arg.all { it is BaseComponent }) -> @Suppress("UNCHECKED_CAST") SimpleScalar((arg as SpigotText).toPlainText())
-            is PaperText -> SimpleScalar(arg.toPlainText())
             is Text -> SimpleScalar(arg.toPlainText())
             else -> SimpleScalar(arg.toString())
         }
