@@ -1,25 +1,10 @@
 package it.pureorigins.common
 
 import com.google.gson.*
-import io.netty.channel.ChannelHandler
-import io.netty.util.concurrent.Future
-import net.minecraft.commands.CommandSourceStack
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.ComponentUtils
-import net.minecraft.network.chat.MutableComponent
-import net.minecraft.network.chat.Style
-import net.minecraft.network.protocol.Packet
-import net.minecraft.server.dedicated.DedicatedServer
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.util.GsonHelper
+import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.World
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
