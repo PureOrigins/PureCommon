@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "it.pureorigins"
-version = "0.4.1"
+version = "0.4.3"
 
 bukkit {
     name = project.name
