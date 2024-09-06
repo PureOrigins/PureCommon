@@ -1,10 +1,6 @@
 package it.pureorigins.common
 
 import kotlinx.serialization.*
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.FileNotFoundException
@@ -49,7 +45,6 @@ inline fun <reified T> Json.readFileAs(file: Path, deserializer: Deserialization
     return try {
         decodeFromString(deserializer, text)
     } catch (e: Throwable) {
-        @OptIn(ExperimentalStdlibApi::class)
         exceptionHandler(SerializationException("An error occurred while deserializing $text to ${typeOf<T>()}", e))
     }
 }

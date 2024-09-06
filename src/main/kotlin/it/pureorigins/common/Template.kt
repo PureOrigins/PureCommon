@@ -2,7 +2,6 @@ package it.pureorigins.common
 
 import freemarker.core.CommonMarkupOutputFormat
 import freemarker.core.CommonTemplateMarkupOutputModel
-import freemarker.core.HTMLOutputFormat
 import freemarker.template.*
 import freemarker.template.utility.DeepUnwrap
 import kotlinx.serialization.serializer
@@ -45,9 +44,9 @@ fun String.templateJson(args: Map<String, Any?>, locale: Locale = Locale.ROOT) =
     outputFormat = JsonOutputFormat
 }
 
-fun String.templateHtml(args: Map<String, Any?>, locale: Locale = Locale.ROOT) = template(args) {
+fun String.templateMiniMessage(args: Map<String, Any?>, locale: Locale = Locale.ROOT) = template(args) {
     this.locale = locale
-    outputFormat = HTMLOutputFormat.INSTANCE
+    outputFormat = MiniMessageOutputFormat
 }
 
 fun String.templateJson(vararg args: Pair<String, Any?>, locale: Locale = Locale.ROOT) = templateJson(args.toMap(), locale)
@@ -57,7 +56,7 @@ fun String.templateText(args: Map<String, Any?>, locale: Locale = Locale.ROOT): 
         val text = templateJson(args, locale)
         textFromJson(text)
     } else {
-        val text = templateHtml(args, locale)
+        val text = templateMiniMessage(args, locale)
         MiniMessage.miniMessage().deserialize(text)
     }
 }
@@ -89,6 +88,33 @@ private object JsonOutputFormat : CommonMarkupOutputFormat<TemplateJsonOutputMod
     }
     override fun isLegacyBuiltInBypassed(builtInName: String) = false
     override fun newTemplateMarkupOutputModel(plainTextContent: String?, markupContent: String?) = TemplateJsonOutputModel(plainTextContent, markupContent)
+}
+
+private class MiniMessageOutputModel(plainTextContent: String?, markupContent: String?) : CommonTemplateMarkupOutputModel<MiniMessageOutputModel>(plainTextContent, markupContent) {
+    override fun getOutputFormat() = MiniMessageOutputFormat
+}
+
+private object MiniMessageOutputFormat : CommonMarkupOutputFormat<MiniMessageOutputModel>() {
+    override fun getName() = "MiniMessage"
+    override fun getMimeType() = null
+    override fun output(textToEsc: String, out: Writer) {
+        textToEsc.forEach {
+            when (it) {
+                '<', '>', '"', '\'', '\\' -> out.write("\\$it")
+                else -> out.write(it.code)
+            }
+        }
+    }
+    override fun escapePlainText(plainTextContent: String) = buildString {
+        plainTextContent.forEach {
+            when (it) {
+                '\\', '"' -> append("\\$it")
+                else -> append(it)
+            }
+        }
+    }
+    override fun isLegacyBuiltInBypassed(builtInName: String) = false
+    override fun newTemplateMarkupOutputModel(plainTextContent: String?, markupContent: String?) = MiniMessageOutputModel(plainTextContent, markupContent)
 }
 
 private object UnicodeTemplateMethodModel : TemplateMethodModelEx {

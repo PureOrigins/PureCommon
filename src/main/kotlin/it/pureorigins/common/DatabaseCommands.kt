@@ -10,8 +10,12 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
         registerCommand(database)
         registerCommand(query)
     }
-    
-    val database get() = literal("database") {
+
+    // /database test url <url>
+    // /database test username <username>
+    // /database test password <password>
+
+    private val database get() = literal("database") {
         requiresPermission("purecommon.database")
         success { source.sendNullableMessage(config.database.usage?.templateText()) }
         then(argument("name", string()) {
@@ -72,8 +76,8 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
             })
         })
     }
-    
-    val query get() = literal("query") {
+
+    private val query get() = literal("query") {
         requiresPermission("purecommon.query")
         success { source.sendNullableMessage(config.query.usage?.templateText()) }
         then(argument("database", string()) {
@@ -112,11 +116,11 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
         })
     }
     
-    fun getDatabases(): MutableMap<String, DatabaseInfo> {
+    private fun getDatabases(): MutableMap<String, DatabaseInfo> {
         return json.readFileAs(plugin.file("databases.json"), mutableMapOf())
     }
     
-    fun setDatabases(databases: Map<String, DatabaseInfo>) {
+    private fun setDatabases(databases: Map<String, DatabaseInfo>) {
         json.writeFile(plugin.file("databases.json"), databases)
     }
     
@@ -125,22 +129,22 @@ class DatabaseCommand(private val plugin: PureCommon, private val config: Config
     
     @Serializable
     data class Config(
-        val invalidDatabase: String? = "{\"text\": \"Unknown database: \${name}\", \"color\": \"dark_gray\"}",
-        val error: String? = "{\"text\": \"An error has occurred: \${error.message}\", \"color\": \"dark_gray\"}",
+        val invalidDatabase: String? = "<dark_gray>Unknown database: \${name}\"</dark_gray>",
+        val error: String? = "<dark_gray>An error has occurred: \${error.message}\"</dark_gray>",
         val database: Database = Database(),
         val query: Query = Query()
     ) {
         @Serializable
         data class Database(
-            val usage: String? = "[{\"text\": \"Usage: \", \"color\": \"dark_gray\"}, {\"text\": \"/database <name> [url]\", \"color\": \"gray\"}]",
-            val get: String? = "{\"text\": \"Database \${name} (\${database.vendor}) is '\${url}'\", \"color\": \"gray\"}",
-            val set: String? = "{\"text\": \"Database \${database.vendor} saved as '\${name}'\", \"color\": \"gray\"}",
+            val usage: String? = "<dark_gray>Usage:</dark_gray> <gray>/database \\<name\\> [url]</gray>",
+            val get: String? = "<gray>Database \${name} (\${database.vendor}) is '\${url}'</gray>",
+            val set: String? = "<gray>Database \${database.vendor} saved as '\${name}'</gray>",
         )
         
         @Serializable
         data class Query(
-            val usage: String? = "[{\"text\": \"Usage: \", \"color\": \"dark_gray\"}, {\"text\": \"/query <database> <query>\", \"color\": \"gray\"}]",
-            val result: String? = "{\"text\": \"Query executed, \${size} result<#if size != 1>s</#if><#if (size > 0)>\n<#list results as row><#list row as column>\${column}<#sep>, </#list><#sep>\n</#list><#if (size > results?size - 1)>\n...</#if></#if>\", \"color\": \"gray\"}",
+            val usage: String? = "<dark_gray>Usage:</dark_gray> <gray>/query \\<database\\> \\<query\\></gray>",
+            val result: String? = "<gray>Query executed, \${size} result<#if size != 1>s</#if><#if (size > 0)>\n<#list results as row><#list row as column>\${column}<#sep>, </#list><#sep>\n</#list><#if (size > results?size - 1)>\n...</#if></#if></gray>",
             val maxResultSize: Int = 10
         )
     }
