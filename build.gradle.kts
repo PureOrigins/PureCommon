@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "it.pureorigins"
-version = "0.4.1"
+version = "0.4.4"
 
 bukkit {
     name = project.name
@@ -27,8 +27,8 @@ dependencies {
     compileOnly("org.purpurmc.purpur:purpur-api:1.21.1-R0.1-SNAPSHOT")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
     api("org.freemarker:freemarker:2.3.31")
-    api("org.jetbrains.exposed:exposed-core:0.37.3")
-    api("org.jetbrains.exposed:exposed-jdbc:0.37.3")
+    api("org.jetbrains.exposed:exposed-core:0.54.0")
+    api("org.jetbrains.exposed:exposed-jdbc:0.54.0")
     api("org.postgresql:postgresql:42.7.2")
     api("org.xerial:sqlite-jdbc:3.41.2.2")
 }
