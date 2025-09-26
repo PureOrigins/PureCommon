@@ -29,12 +29,13 @@ fun JavaPlugin.registerCommand(
 
 fun literal(literal: String, builder: LiteralArgumentBuilder<CommandSourceStack>.() -> Unit) = Commands.literal(literal).apply(builder).build()!!
 
-inline fun <T> argument(
+fun <S, B : ArgumentBuilder<S, B>, R> ArgumentBuilder<S, B>.argument(
     name: String,
-    type: ArgumentType<T>,
-    block: RequiredArgumentBuilder<CommandSourceStack, T>.() -> Unit
-) =
-    Commands.argument(name, type).apply(block).build()!!
+    type: ArgumentType<R>,
+    block: RequiredArgumentBuilder<S, R>.() -> Unit
+): ArgumentBuilder<S, B> =
+    then(RequiredArgumentBuilder.argument<S, R>(name, type).also(block))
+
 
 fun ArgumentBuilder<CommandSourceStack, *>.requiresPermission(name: String, orElse: PermissionDefault = PermissionDefault.OP) =
     requires(requirement.and { it.sender.hasPermission(Permission(name, null, orElse)) })!!

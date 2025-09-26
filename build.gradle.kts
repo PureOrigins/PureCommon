@@ -1,21 +1,21 @@
 import org.gradle.kotlin.dsl.bukkit
 
 plugins {
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.serialization") version "2.0.20"
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.serialization") version "2.2.20"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
 }
 
 group = "it.pureorigins"
-version = "0.4.4"
+version = "0.4.5"
 
 bukkit {
     name = project.name
     version = project.version.toString()
     main = "it.pureorigins.common.${project.name}"
-    apiVersion = "1.21.1"
+    apiVersion = "1.21.8"
 }
 
 repositories {
@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.purpurmc.purpur:purpur-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("org.purpurmc.purpur:purpur-api:1.21.8-R0.1-SNAPSHOT")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
     api("org.freemarker:freemarker:2.3.31")
     api("org.jetbrains.exposed:exposed-core:0.54.0")
